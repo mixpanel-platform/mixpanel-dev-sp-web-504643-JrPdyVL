@@ -1,15 +1,114 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/css/reset.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.css">
     <script src="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.js"></script>
-  </head>
   <body class="mixpanel-platform-body">
-    <h1>Hello, World!</h1>
+      <table id="events">
+          <thead>
+              <tr>
+                  <th>Events</th>
+                  <th>Properties</th>
+              </tr>
+          </thead>
+          <tbody>
+          </tbody>
+      </table>
+
     <script>
-      // Run queries and display results here
+        var spec = [
+            ['Getting Started - Login', ['Utm_amp','Utm_prod','Utm_loc']],
+            ['Login Failed',[]],
+            ['Sign Up - Submit'],[]]
+            ['Choose a Plan - Submit', ['Plan Type']],
+            ['Personal Info - Submit',[]],
+            ['Personal Info Back Submit', []],
+            ['Personal Info - Address Confirmed', []],
+            ['Business Info - Submit', ['Has EIN', 'Business Type', 'Industry Type']],
+            ['Business Info Back', []],
+            ['Business Info Federal Submit', []],
+            ['Business Info Federal Back'],[]],
+            ['Make Sure We Have it Right - Submit', []],                                        
+            ['Identity Check Web - Submit', []],
+            ['Link Bank Account', ['location']],
+            ['Enrollment Completete', ['Reader']],
+            ['Email Receipt', []], 
+            ['Sales - Click', []], 
+            ['Sales Download', []], 
+            ['Sales Download Complete', []],
+            ['Item Details', []], 
+            ['Sales More Info Click', []],
+            ['Banking - Click', []], 
+            ['Banking  Verify Micro Deposit', []], 
+            ['Items - Click', []],
+            ['Add Item Start', []],
+            ['Item Created', []],
+            ['Items StitchLabs Click', []], 
+            ['Items StitchLabs connect', []],
+            ['Reports - Click', []], 
+            ['Reports Calendar Click', []],
+            ['Reports Date Selected', ['Date Range']],
+            ['Reports Line Chart', []],
+            ['Offers - Click', []], 
+            ['Offer Start', []],
+            ['Offer Created', []],
+            ]
+            $(document).ready(function(){
+                $.each(spec, function(i, eventInfo){
+                    eventName = eventInfo[0]
+                    $.each(eventInfo, function(j, value){
+                        if (j == 0) {
+                            id = eventName;
+                            newRow = "<tr>" +
+                                       "<td id='" + id + "'>" + value + "</td>" +
+                                       "<td></td>" +
+                                     "</tr>";
+                        }
+                        else {
+                            newRow = ""
+                            $.each(value, function(k, property){
+                                id = eventName + "-" + property;
+                                newRow += "<tr>" +
+                                            "<td></td>" +
+                                            "<td id='" + id + "'>" + property + "</td>" +
+                                          "</tr>";
+                            })
+                        }
+                        $('#events > tbody').append(newRow)
+                    })
+                })
+            MP.api.ready(function() {
+                  
+                  checker = function(name, properties) {
+                      MP.api.topProperties(name).done(function(results){
+                          if ($.isEmptyObject(results.json)) {
+                              $(document.getElementById(name)).css('color', 'red')
+                          }
+                          
+                          propNamesExist = results.json;
+                          $.each(properties, function(index, desiredProp) {
+                              id = name + "-" + desiredProp
+                              console.log(id);
+                              if (propNamesExist[desiredProp]) {
+                                  console.log('boop')
+                                  $(document.getElementById(id)).css('color', 'green');
+                              }
+                              else {
+                                  $(document.getElementById(id)).css('color', 'red');
+                              }
+                          })
+                      })
+                  }
+                          
+                  $.each(spec, function(index, eventInfo) { 
+                        currentEvent = eventInfo
+                        eventName = currentEvent[0];
+                        eventProps = currentEvent[1];
+                        checker(eventName, eventProps);
+                  });
+            });
+        })
     </script>
   </body>
 </html>
